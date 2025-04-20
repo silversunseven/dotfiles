@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+function select_server() {
+  local hosts=()
+  #Creating an Associated array as i need to map the hostname to the funky_alias
+  declare -A funky_alias_map
+
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+      first_hostname=$(echo "$line" | awk '{print $2}') # this is just the hostname, i need this this maint windows
+      funky_alias=$(echo "$line" | ggrep -Eo '\b(e|en|p|pr|i|in|t|te|d|de|r|re|v|vp)-[-A-Za-z0-9]+\b' | head -n1)
+
+      if [[ -n "$first_hostname" && -n "$funky_alias" ]]; then
+        display_entry="$first_hostname $funky_alias"
+        funky_alias_map["$display_entry"]="$funky_alias"
+        hosts+=("$display_entry")
+      elif [[ -n "$funky_alias" ]]; then
+        funky_alias_map["$funky_alias"]="$funky_alias"
+        hosts+=("$funky_alias")
+      fi
+    fi
+  done < <(cat "${HOME}/work/sax82845-etc-hosts/hosts" "${HOME}/work/cmbs0006-etc-hosts/hosts")
+
+  # These hosts do not exist in the existing hosts. They are added here.
+  hosts+=("hargus.abx-net.net hargus.abx-net.net")
+  funky_alias_map["hargus.abx-net.net hargus.abx-net.net"]="hargus.abx-net.net"
+
+  # Needed until cmbs0100 goes to it's happy place
+  #  hosts+=("cmbs0100.cmb.lan p-gin-nfs0")
+  #  funky_alias_map["cmbs0100.cmb.lan p-gin-nfs0"]="cmbs0100.cmb.lan"
+
+  selected_servers=$(printf "%s\n" "${hosts[@]}" | sort -u | fzf --multi)
+
+  if [[ -z "$selected_servers" ]]; then
+    exit 0
+  fi
+
+  IFS=$'\n' read -rd '' -a servers <<<"$selected_servers"
+
+  ssh_targets=()
+  for server in "${servers[@]}"; do
+    ssh_targets+=("${funky_alias_map[$server]}")
+  done
+
+  if [[ ${#ssh_targets[@]} -eq 1 ]]; then
+    ssh "${ssh_targets[0]}"
+    exit 0
+  fi
+
+  session_name="tmux-sshw"
+
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    tmux kill-session -t "$session_name"
+  fi
+
+  tmux new-session -d -s "$session_name"
+
+  first_server="${ssh_targets[0]}"
+  tmux send-keys -t "$session_name" "ssh $first_server" C-m
+
+  for server in "${ssh_targets[@]:1}"; do
+    tmux split-window -t "$session_name" -h "ssh $server"
+    sleep 0.2 # Prevent race conditions, might need to increase this
+  done
+
+  tmux select-layout -t "$session_name" tiled
+  tmux set-window-option -t "$session_name" synchronize-panes on
+  tmux attach -t "$session_name"
+}
+
+select_server

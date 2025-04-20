@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [[ -z "$1" ]]; then
+  echo "Usage: $0 <environment>"
+  exit 1
+fi
+
+ENVIRONMENT=$1
+
+declare -A SERVERS
+SERVERS["test"]="cmbs0609 cmbs0610"
+SERVERS["prod"]="cmbs0628 cmbs0629"
+SERVERS["int"]="cmbs0616 cmbs0617"
+
+if [[ -z "${SERVERS[$ENVIRONMENT]}" ]]; then
+  echo "Error: No servers defined for environment '$ENVIRONMENT'"
+  exit 1
+fi
+
+read -r SERVER1 SERVER2 <<<"${SERVERS[$ENVIRONMENT]}"
+
+check_server() {
+  local SERVER=$1
+  ssh -t $SERVER "sudo sudo -i -u postgres psql -c 'SELECT pg_is_in_recovery();'" 2>/dev/null | tail -3 | head -1 | tr -d '[:space:]'
+}
+
+STATUS1=$(check_server $SERVER1)
+STATUS2=$(check_server $SERVER2)
+
+if [[ "$STATUS1" == "f" ]]; then
+  echo
+  echo "PRIMARY : $SERVER1"
+  echo "STANDBY : $SERVER2"
+elif [[ "$STATUS2" == "f" ]]; then
+  echo
+  echo "PRIMARY : $SERVER2"
+  echo "STANDBY : $SERVER1"
+else
+  echo "ERROR: Unable to determine primary and standby roles."
+fi
