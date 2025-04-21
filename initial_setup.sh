@@ -90,10 +90,6 @@ defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
 # Accelerated playback when adjusting the window size.
 defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
 
-# Install SNOW lookup
-cd automator
-./setup.sh
-
 # Create symlinks
 stow .
 
