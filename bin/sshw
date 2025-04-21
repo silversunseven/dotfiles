@@ -27,7 +27,7 @@ function select_server() {
   # Multi-select via fzf
   selected=$(printf '%s\n' "${display_entries[@]}" | fzf --multi --prompt="Choose host(s): ")
 
-  [[ -z "$selected" ]] && echo "⚠️ No host selected. Exiting." && return 1
+  [[ -z "$selected" ]] && echo "WARN: No host selected. Exiting." && return 1
 
   ssh_targets=()
   while IFS= read -r line; do
