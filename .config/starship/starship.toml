@@ -22,6 +22,7 @@ symbol = " "
 symbol = " "
 format = 'via [${symbol}${version} \($virtualenv\)]($style) '
 style = "bright-yellow"
+command_timeout = 2000
 
 [package]
 symbol = "󰏗 "
