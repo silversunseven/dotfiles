@@ -36,7 +36,6 @@ for folder in "${FOLDERS[@]}"; do
 done
 
 # Install Homebrew
-echo "If this step fails, then run it from the internet directly"
 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 export PATH="/opt/homebrew/bin:$PATH"
 brew bundle install --file=./Brewfile # Install all packages
@@ -94,10 +93,6 @@ defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
 # Install SNOW lookup
 cd automator
 ./setup.sh
-
-echo "Nearly done! Connect to the internet and press any key to continue..."
-read
-brew bundle install --file=./Brewfile_internet
 
 # Create symlinks
 stow .

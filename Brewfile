@@ -1,6 +1,5 @@
 tap "containeroo/tap"
 tap "hashicorp/tap"
-tap "homebrew/bundle"
 tap "homebrew/services"
 tap "nikitabobko/tap"
 # General-purpose data compression with high compression ratio
@@ -109,3 +108,13 @@ cask "appcleaner"
 cask "firefox"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
+tap "containeroo/tap"
+tap "hashicorp/tap"
+tap "homebrew/services"
+tap "nikitabobko/tap"
+# Automate deployment, configuration, and upgrading
+brew "ansible"
+# Terraform
+brew "hashicorp/tap/terraform"
+# Vault
+brew "hashicorp/tap/vault"
