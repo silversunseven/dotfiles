@@ -1,6 +1,5 @@
 tap "containeroo/tap"
 tap "hashicorp/tap"
-tap "homebrew/services"
 tap "nikitabobko/tap"
 # General-purpose data compression with high compression ratio
 brew "xz"
@@ -118,3 +117,7 @@ brew "ansible"
 brew "hashicorp/tap/terraform"
 # Vault
 brew "hashicorp/tap/vault"
+# docker completion
+brew "docker-completion"
+
+
