@@ -1,0 +1,4 @@
+  if client.server_capabilities.renameProvider then
+    nmap({ "<leader>r", vim.lsp.buf.rename, map_opts })
+  end
+

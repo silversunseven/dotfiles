@@ -1,0 +1,122 @@
+# shellcheck disable=SC2148
+alias ll='ls -l'
+alias ......='cd ../../../../..;'
+alias .....='cd ../../../..;'
+alias ....='cd ../../..;'
+alias ...='cd ../..;'
+alias ..='cd ..;'
+alias kc='kubectx'
+alias kn='kubens'
+alias grep='ggrep --color'
+alias sed=gsed
+alias kleak="kubectl get secrets -ogo-template='{{ range \$k, \$v := .data }}{{ \$k }}:{{ printf \"\\n\" }}{{ \$v | base64decode }}{{ printf \"\\n\\n\" }}{{ end }}'"
+alias kleakn="kubectl get secrets -ogo-template='{{ range \$k, \$v := .data }}{{ \$k }}:{{ printf \"\\n\" }}{{ \$v | base64decode }}{{ printf \"\\n\\n\" }}{{ end }}' --namespace"
+alias gia='git add --all'
+alias gip='git push'
+alias gis='git status'
+alias gid='git diff'
+alias gica='git commit --amend --no-edit'
+alias gipf='git push --force'
+alias gipt='git push --tags'
+alias gisw='git switch'
+alias vim='nvim'
+alias vi='nvim'
+alias vimdiff='nvim -d'
+alias pullhosts='cd;cd work;cd cmbs0006-etc-hosts; git pull; cd ../sax82845-etc-hosts; git pull'
+alias kproxy='unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy no_proxy NO_PROXY'
+alias sproxy='source ~/.zprofile'
+alias postt='cd ~/work/postgres/test/;cd'
+alias posti='cd ~/work/postgres/int/;cd'
+alias postp='cd ~/work/postgres/prod/;cd'
+alias unbind='bindkey -r F; bindkey -r J'
+alias resource='source ~/dotfiles/.config/zsh/.zshrc'
+alias rdp='cd ~/work/mgmt;./launch_rdp.sh'
+# Tunnels
+alias tun_phivemq='ssh -J axary@hargus.abx-net.net -L 9999:localhost:8080 -fN axary@prxmdb001.astra-pr.local && while ! nc -z localhost 9999; do sleep 1; done; firefox http://localhost:9999'
+alias tun_pmarathon='ssh -J axary@hargus.abx-net.net -L 9990:localhost:8080 -fN axary@prxmma001.astra-pr.local && while ! nc -z localhost 9990; do sleep 1; done; firefox http://localhost:9990'
+alias tun_i12='ssh -J axary@hargus.abx-net.net -L 19992:inxvid012:19999 -N axary@inxvid012 & while ! nc -z localhost 19992; do sleep 1; done; firefox http://localhost:19992'
+alias tun_i11='ssh -J axary@hargus.abx-net.net -L 19991:inxvid011:19999 -N axary@inxvid011 & while ! nc -z localhost 19991; do sleep 1; done; firefox http://localhost:19991'
+
+# Other known tunnels from Jan
+#tunnel-astravideo ssh -fN -L 9000:prxvid011:9000 -J hargus prxvid011
+#tunnel-hivemq ssh -fN -4 -L 9999:vpxmdb001:8080 -J hargus vpxmdb001 ssh -fN -4 -L 9998:prxmdb001:8080 -J hargus prxmdb001
+#tunnel-jolokia ssh -fN -4 -L 9998:prxmdb001:8778 -J hargus prxmdb001
+#tunnel-marathon ssh -fN -L 9997:vpxmma001:8080 -J hargus vpxmma001 ssh -fN -L 9996:prxmma001:8080 -J hargus prxmma001
+
+function expand-alias() {
+  zle _expand_alias
+  zle self-insert
+}
+zle -N expand-alias
+bindkey -M main ' ' expand-alias
+
+function gic() {
+  # shellcheck disable=SC2124
+  text="$@"
+  git commit -m "$text"
+}
+
+function zsh_plugins_update() {
+  for d in ~/.config/plugins/zsh/*; do
+    pushd "$d" >/dev/null || continue
+    echo -e "\033[1m==> Processing zsh plugin ${BLUE}$(basename "$d")\033[0m"
+    git pull
+    popd >/dev/null || continue
+    echo -e "\n"
+  done
+}
+
+[ -f ~/.config/plugins/zsh/kubectl-aliases/.kubectl_aliases ] && source \
+  <(cat ~/.config/plugins/zsh/kubectl-aliases/.kubectl_aliases | sed -r 's/(kubectl.*) --watch/watch \1/g')
+
+function sync_rancher_clusters() {
+  RANCHER_TOKEN=$(op read "op://ABX/Rancher API/credential")
+
+  for cluster in $(curl -sSL --header "Authorization: Bearer ${RANCHER_TOKEN}" https://cop.abraxas-its.ch/v3/clusters | jq -r '.data[] | "\(.id)|\(.name)"'); do
+    cluster_id=${cluster%|*}
+    cluster_name=${cluster#*|}
+
+    if [[ $cluster_name =~ ^[pt][0-9]{2} ]]; then
+      echo -e "\033[1m==> Skipping cluster ${BLUE}${cluster_name}\033[0m"
+      continue
+    fi
+
+    if [ ! -d ~/work/kubeconfigs/"${cluster_name}" ]; then
+      echo -e "\033[1m==> Creating directory for cluster ${BLUE}${cluster_name}\033[0m"
+      mkdir ~/work/kubeconfigs/"${cluster_name}"
+    fi
+
+    if [ ! -f ~/work/kubeconfigs/"${cluster_name}"/kubeconfig ]; then
+      echo -e "\033[1m==> Downloading kubeconfig for cluster ${BLUE}${cluster_name}\033[0m"
+      curl -X POST -sSL --header "Authorization: Bearer ${RANCHER_TOKEN}" "https://cop.abraxas-its.ch/v3/clusters/${cluster_id}?action=generateKubeconfig" | jq -r '.config' >~/work/kubeconfigs/"${cluster_name}"/kubeconfig
+    fi
+
+    if [ ! -f ~/work/kubeconfigs/"${cluster_name}"/.envrc ]; then
+      echo -e "\033[1m==> Creating .envrc for cluster ${BLUE}${cluster_name}\033[0m"
+      echo "source ~/dotfiles/envrc/kubeconfig" >~/work/kubeconfigs/"${cluster_name}"/.envrc
+    fi
+
+    if [[ $cluster_name == "local" || $cluster_name == "v-"* ]]; then
+      echo -e "\033[1m==> Skipping ArgoCD apps for cluster ${BLUE}${cluster_name}\033[0m"
+      continue
+    fi
+  done
+}
+
+vpnchk() {
+  if nslookup sax82845.abx-net.net >/dev/null 2>&1; then
+    echo -e "\e[32mVPN OK\e[0m"
+  else
+    echo -e "\e[31mVPN NOK\e[0m"
+  fi
+}
+
+fzf_open_file() {
+  local file
+  file=$(find . -type f | fzf --preview 'bat --style=numbers --color=always --line-range=:100 {}')
+  [[ -n "$file" ]] && nvim "$file"
+}
+
+export PATH="$HOME/dotfiles/bin:$PATH"
+# vi: ft=zsh
+#

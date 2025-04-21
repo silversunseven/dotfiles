@@ -1,0 +1,24 @@
+[user]
+  name = Aiden Ryan
+  email = aiden.ryan@abraxas.ch
+	signingkey = ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCv769mUlxKG1tpZMy4y6I5mGBXAfrrFzmxl24+FmTqjlIr45pCy84gaegX6GWqB4X274JNobJAZdeLGqAiPw85/XaMfCJV7jZVfMSQhjvebgZd8wa/SSu+CrPZ50rAsZkiM7GmKl+T5a4msEhNfKLpLwoQsiFYi/PuesgvJ2E4M/IJe2bgkH1YhrVujeJw160VU+9fBDPJ1GRJC70YZ4OJTrwH2jlkkfISRUiiTMqrtB+Pdz1B+VcvpbRtBlgdckuyyFt0KDfA/vL82bWc8oXgPcpDS0MQwb02RVsAiAl9gT8MeP+w6xs+bg6m1qzrlSDj5B5OmyLh1pEtVBZILczEXl5/anMgu1igNtDTN8pCjXaTQcfEzMaEHVGzeFa/cMziHk2QcJSQq7EHF7mCPa53tRp3g6gqdBdV8SaXFVxtRApIic4ksVdULYYRvo7xy0Qu1xVJvGyJ7P1szAnacEhUtZ4+iEqqHjORUk2BIwIYlPdKu0nRI51cVFT3Pb8yeeKFSSkX0ZLhk5BXdVzjVOZ4Qg3wlpLri9YmlwMTGotzTQTANeR43jy040cJoXE5+028vhqzm0EGrR0ZPkMxO+2RW2ksrUm5vBdUyYOqGCculDW6eQMACaQh8Mjkr9Rcc8DQ+o4jqrJktS360ftdBP3CVvcWfGwBPwmJnQ6X4kqd/Q==
+[init]
+  defaultBranch = master
+[core]
+  editor = nvim
+[pull]
+  rebase = true
+[fetch]
+  prune = true
+[diff]
+  colorMoved = zebra
+[push]
+  autoSetupRemote = true
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[commit]
+	gpgsign = true
+[user]
+# vi: ft=gitconfig
