@@ -22,26 +22,12 @@ alias gisw='git switch'
 alias vim='nvim'
 alias vi='nvim'
 alias vimdiff='nvim -d'
-alias pullhosts='cd;cd work;cd cmbs0006-etc-hosts; git pull; cd ../sax82845-etc-hosts; git pull'
-alias kproxy='unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy no_proxy NO_PROXY'
-alias sproxy='source ~/.zprofile'
 alias postt='cd ~/work/postgres/test/;cd'
 alias posti='cd ~/work/postgres/int/;cd'
 alias postp='cd ~/work/postgres/prod/;cd'
 alias unbind='bindkey -r F; bindkey -r J'
 alias resource='source ~/dotfiles/.config/zsh/.zshrc'
 alias rdp='cd ~/work/mgmt;./launch_rdp.sh'
-# Tunnels
-alias tun_phivemq='ssh -J axary@hargus.abx-net.net -L 9999:localhost:8080 -fN axary@prxmdb001.astra-pr.local && while ! nc -z localhost 9999; do sleep 1; done; firefox http://localhost:9999'
-alias tun_pmarathon='ssh -J axary@hargus.abx-net.net -L 9990:localhost:8080 -fN axary@prxmma001.astra-pr.local && while ! nc -z localhost 9990; do sleep 1; done; firefox http://localhost:9990'
-alias tun_i12='ssh -J axary@hargus.abx-net.net -L 19992:inxvid012:19999 -N axary@inxvid012 & while ! nc -z localhost 19992; do sleep 1; done; firefox http://localhost:19992'
-alias tun_i11='ssh -J axary@hargus.abx-net.net -L 19991:inxvid011:19999 -N axary@inxvid011 & while ! nc -z localhost 19991; do sleep 1; done; firefox http://localhost:19991'
-
-# Other known tunnels from Jan
-#tunnel-astravideo ssh -fN -L 9000:prxvid011:9000 -J hargus prxvid011
-#tunnel-hivemq ssh -fN -4 -L 9999:vpxmdb001:8080 -J hargus vpxmdb001 ssh -fN -4 -L 9998:prxmdb001:8080 -J hargus prxmdb001
-#tunnel-jolokia ssh -fN -4 -L 9998:prxmdb001:8778 -J hargus prxmdb001
-#tunnel-marathon ssh -fN -L 9997:vpxmma001:8080 -J hargus vpxmma001 ssh -fN -L 9996:prxmma001:8080 -J hargus prxmma001
 
 function expand-alias() {
   zle _expand_alias
